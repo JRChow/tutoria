@@ -16,7 +16,11 @@ Including another URLconf
 from __future__ import (absolute_import, print_function)
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
+
+admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls, name='admin'),
@@ -25,4 +29,8 @@ urlpatterns = [
     url(r'^tutor/', include('tutor.urls', namespace='tutor'), name='tutor'),
     # app_name: authentication namespace: auth
     url(r'^auth/', include('authentication.urls', namespace='auth'), name='auth'),
-]
+	url(r'^api/keywords/', views.get_keywords, name='get_keywords'),
+    url(r'^dashboard/',include('dashboard.urls', namespace='dashboard'), name='dashboard'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+

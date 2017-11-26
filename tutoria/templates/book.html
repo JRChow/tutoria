@@ -1,16 +1,44 @@
 {% extends "base.html" %} {% load staticfiles %} {% block title %}Book Session{% endblock %} {% block content %}
-
 <div class="container">
-  <form method="post">
-    {% csrf_token %}
-    <input type="radio" name="choice_0" id="choice_0" value="choice_0" />
-    <label for="choice_0">8:30-9:00</label><br />
-    <input type="radio" name="choice_1" id="choice_1" value="choice_1" />
-    <label for="choice_1">9:00-9:30</label><br />
-    <input type="radio" name="choice_2" id="choice_2" value="choice_2" />
-    <label for="choice_2">9:30-10:00</label><br />
-    <input type="submit" value="Book" />
-  </form>
+  <div class="row">
+    <div class="col-md-offset-4 col-md-4">
+      <h1>Confirm Booking</h1>
+      <h3>Session</h3>
+      <p>{{ session.start_time }} - {{ session.end_time }}</p>
+      <h3>Tutor</h3>
+      <p>
+        {{ tutor.first_name }} {{ tutor.last_name }}
+      </p>
+      <h3>Tag</h3> {% for tag in tutor.tags.all %}
+      <p>{{ tag.tag }}</p> {% endfor %}
+      <h3>Course</h3> {% for course in tutor.courses.all %}
+      <p>{{ course.course_code }}</p> {% endfor %}
+    </div>
+    <div class="col-md-offset-4 col-md-4">
+      <h3>Fee: ${{tutor.hourly_rate}}</h3>
+      <h3>Commission: ${{commission}}</h4>
+      <h2><strong>Total: ${{total}}</strong></h2>
+      <h3>Balance: ${{balance}}</h3>
+    </div>
+  </div>
+
+  <hr style="width: 50%; color: grey; height: 1px; background-color:grey;" />
+
+  <div class="row">
+    <div class="col-md-offset-4 col-md-4">
+      <input id="coupon_checkbox" name="coupon_checkbox" type="checkbox" value="coupon" onclick="var input = document.getElementById('coupon_input'); if(this.checked){ input.disabled = false; input.focus();}else{input.disabled=true;}" />
+      <label for="coupon_checkbox">Use Coupon</label>
+      <input type="text" id="coupon_input" name="coupon_input_field" disabled="disabled" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-offset-5 col-md-4">
+      <form action="{% url 'tutor:save_booking' tutor_id=tutor.id %}" method="POST" role="form" class="form-horizontal">
+        {% csrf_token %}
+        <button name="session_id" type="submit" onclick="return confirm('Email Sent!')" value="{{ session.id }}" class="btn btn-default">Confirm Booking</button>
+      </form>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

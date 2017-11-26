@@ -1,0 +1,138 @@
+{% extends "base.html" %} {% load staticfiles %} {% block title %}Tutoria{% endblock %} {% block content %}
+    <div class="container">
+        {% if is_tutor == True %}
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <h3>Tutor Timetable</h3>
+                Pattern:&nbsp; 
+                <button type="button" class="bg-primary" onclick="return confirm('Click on booked slot to see detail')">Booked</button>&nbsp;
+                <button type="button" class="bg-success" onclick="return confirm('Click on bookable slot to close')">Bookable</button>&nbsp;
+                <button type="button" class="bg-info" onclick="return confirm('Click on closed slot to open')">Closed</button>&nbsp;
+                <button type="button" class="bg-danger" onclick="return confirm('Passed slot means the specific time slot has passed')">Passed</button>
+                <br />
+                <table class="" border="1" cellpadding="0">
+                    <tbody>
+                        <tr>
+                            <td>Tutor Table</td>
+                            {% for i in "xxxxxxxxxxxxxxxxxxxxxxxx" %}
+                            {% if tutor.tutor_type == 'PT' %}
+                            <td colspan="1">
+                            {% else %}
+                            <td colspan="2">
+                            {% endif %}
+                            {% if forloop.counter0 < 10 %}
+                                0{{ forloop.counter0 }}:00
+                            {% else %}
+                                {{ forloop.counter0 }}:00
+                            {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% for grid in tutor_timetable %}
+                        {% if tutor.tutor_type == 'PT' and forloop.counter0|divisibleby:24 or tutor.tutor_type == 'CT' and forloop.counter0|divisibleby:48 %}
+                        <tr class="slots">
+                            <td class="resourcename">
+                                {{ grid.date }}
+                            </td>
+                        {% endif %}
+                        {% if grid.status == 'A' %}
+                            <td colspan="1" class="bg-success">
+                                <form id="book-{{ grid.id }}" method="post" action="{% url 'dashboard:mytimetable' %}" style="cursor:pointer">
+                                {% csrf_token %}
+                                <div onclick="document.getElementById('book-{{ grid.id }}').submit();">
+                                    <input type="hidden" name="session_id" value="{{ grid.id }}">&nbsp;
+                                </div>
+                                </form>
+                            </td>
+                        {% elif grid.status == 'B' %}
+                            <td colspan="1" class="bg-primary">
+                                <form id="book-{{ grid.id }}" method="get" action="{% url 'dashboard:mybookings' %}" style="cursor:pointer">
+                                <div onclick="document.getElementById('book-{{ grid.id }}').submit();">
+                                    <input type="hidden" name="id" value="{{ grid.id }}">&nbsp;
+                                </div>
+                                </form>
+                            </td>
+
+                        {% elif grid.status == 'X' %}
+                            <td colspan="1" class="bg-info">
+                                <form id="book-{{ grid.id }}" method="post" action="{% url 'dashboard:mytimetable' %}" style="cursor:pointer">
+                                {% csrf_token %}
+                                <div onclick="document.getElementById('book-{{ grid.id }}').submit();">
+                                    <input type="hidden" name="session_id" value="{{ grid.id }}">&nbsp;
+                                </div>
+                                </form>
+                            </td>
+
+                        {% elif grid.status == 'PASSED' %}
+                            <td colspan="1" class="bg-danger">&nbsp;
+                            </td>
+
+                        {% endif %}
+                        {% if tutor.tutor_type == 'PT' and forloop.counter|divisibleby:24 or tutor.tutor_type == 'CT' and forloop.counter|divisibleby:48 %}
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if is_student == True %}
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <h3>Student Timetable</h3>
+                Pattern:&nbsp; 
+                <button type="button" class="bg-success" onclick="return confirm('Click on booked slot to see detail')">Booked</button>&nbsp;
+                <button type="button" class="bg-info" onclick="return confirm('Free slot means you have no booking at that time')">Free</button>&nbsp;
+                <button type="button" class="bg-danger" onclick="return confirm('Passed slot means the specific time slot has passed')">Passed</button>
+                <table class="" border="1" cellpadding="0">
+                    <tbody>
+                        <tr>
+                            <td>Student Table</td>
+                            {% for i in "xxxxxxxxxxxxxxxxxxxxxxxx" %}
+                            <td colspan="2">
+                            {% if forloop.counter0 < 10 %}
+                                0{{ forloop.counter0 }}:00
+                            {% else %}
+                                {{ forloop.counter0 }}:00
+                            {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% for grid in student_timetable %}
+                        {% if forloop.counter0|divisibleby:48 %}
+                        <tr class="slots">
+                            <td class="resourcename">
+                                {{ grid.date }}
+                            </td>
+                        {% endif %}
+                        {% if grid.status == 'A' %}
+                            <td colspan="1" class="bg-success">
+                                <form id="book-{{ grid.id }}" method="get" action="{% url 'dashboard:mybookings' %}" style="cursor:pointer">
+                                <div onclick="document.getElementById('book-{{ grid.id }}').submit();">
+                                    <input type="hidden" name="id" value="{{ grid.id }}">&nbsp;
+                                </div>
+                                </form>
+                            </td>
+                        {% elif grid.status == 'PASSED' %}
+                            <td colspan="1" class="bg-danger">&nbsp;
+                            </td>
+                        {% else %}
+                            <td colspan="1" class="bg-info">
+                                <input type="hidden" name="id" value="{{ grid.id }}">&nbsp;
+                            </td>
+
+                        {% endif %}
+                        {% if forloop.counter|divisibleby:48 %}
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+  {% endblock %}

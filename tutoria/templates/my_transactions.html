@@ -1,0 +1,77 @@
+{% extends "base.html" %} {% load staticfiles %} {% block title %}Tutoria{% endblock %} {% block content %}
+{% if not_logged_in == 'true' %}
+   <center><h2>Please Log In First!</h2></center>
+{% else %}
+
+
+
+{% if records is not None %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-11 col-md-offset-1">
+      <div class="col-md-11">
+
+        <th><a href="{% url 'dashboard:mywallet' %}"><center><h2>Current Balance:   {{balance}}</h2></center></a></th>
+        <th><h2> </h2></th>
+        <table class="table table-hover" width="80%">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Transaction type</th>
+              <th>Transaction with</th>
+              <th>Session Type</th>
+              <th>Session start time</th>
+              <th>Session end time</th>
+              <th>Transaction time</th>
+              <th>Amount</th>
+              <th>Commission</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record, transaction in zipped %}
+            <tr>
+              <td>{{forloop.counter}}</td>
+              
+              <td>
+                {% if username == record.student.username %}Paid to{% else %}Received from{% endif %}
+              </td>
+              <td>
+                 {% if username == record.student.username %}
+                <center>
+                  <a href="{% url 'tutor:detail' record.tutor.id %}">{{ record.tutor.first_name }}
+                                      {{record.tutor.last_name }}</a>
+                </center>
+                {% else %}
+                {{ record.student.first_name }} {{ record.student.last_name }}
+                {% endif %}
+              </td>
+              <td>
+                {% if record.tutor.tutor_type == 'CT' %} Contracted Tutoring {% else %} Private Tutoring {% endif %}
+              </td>
+
+              <td>{{record.session.start_time}}</td>
+              <td>{{record.session.end_time}}</td>
+              <td>{{transaction.created_at}}</td>
+              <td>{{transaction.amount }}</td>
+              <td>{{transaction.commission }}</td>
+              <td> {% if record.status == 'F' %}Completed{% elif record.status == 'C' %} {% if user_type == 'Student' %}Refunded{% else %} Canceled {% endif %}{% else %} {% if user_type == 'Student' %}Paid{% else %}Pending completion{% endif %}{% endif %}
+              </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+              <td>No transactions found =(</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% else %}
+
+<h3> No transactions found.</h3> {% endif %}{% endif %} {% endblock %}

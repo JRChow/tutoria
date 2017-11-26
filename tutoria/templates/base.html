@@ -15,6 +15,7 @@
 			<script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 			<script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
+    {% block header %}{% endblock %}
 </head>
 <body>
 <!--Here is the navbar-->
@@ -38,13 +39,28 @@
                 -->
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                {% if user %}
+                {% if user.is_authenticated %}
+									{% if user.is_superuser %}
+                    <li><a href="{% url 'auth:logout' %}">Logout</a></li>
+									{% elif user.is_staff %}
+                    <li><a href="{% url 'dashboard:mywallet' %}">My Wallet</a></li>
+                    <li><a href="{% url 'auth:logout' %}">Logout</a></li>
+									{% else %}
+                    <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Dashboard<span class="caret"></span></a>
+                     <ul class="dropdown-menu">
+                       <li><a href="{% url 'dashboard:mybookings' %}">My Bookings</a></li>
+                       <li><a href="{% url 'dashboard:mytransactions' %}">My Transactions</a></li>
+                       <li><a href="{% url 'dashboard:mytimetable' %}">My Timetable</a></li>
+                       <li><a href="{% url 'dashboard:mywallet' %}">My Wallet</a></li>
+                     </ul>
                     </li>
-                    <li><a href="">Logout</a></li>
-                    <li><a href="">My Account</a></li>
+
+                    <li><a href="{% url 'auth:profile' %}">Profile</a></li>
+                    <li><a href="{% url 'auth:logout' %}">Logout</a></li>
+									{% endif %}
                 {% else %}
-                    <li><a href="">Register</a></li>
-                    <li><a href="">Login</a></li>
+                    <li><a href="{% url 'auth:signup' %}">Sign Up</a></li>
+                    <li><a href="{% url 'auth:login' %}">Login</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -77,5 +93,6 @@
 <script type="text/javascript">
     $('#{{active_menu}}').addClass("active");
 </script>
+{% block js %}{% endblock %}
 </body>
 </html>
